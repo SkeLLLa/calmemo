@@ -51,7 +51,7 @@ too_many_lines = "allow"
 anyhow = "1.0"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 clap = { version = "4.5", features = ["derive"] }
-icalendar = "0.16"
+icalendar = "0.17"
 uuid = { version = "1.23", features = ["v4"] }
 
 [package.metadata.deb]
