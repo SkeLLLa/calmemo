@@ -1,0 +1,9 @@
+[workspace]
+changelog_update = true
+git_release_enable = true
+release_always = true
+semver_check = false
+
+[[package]]
+name = "calmemo"
+changelog_path = "CHANGELOG.md"

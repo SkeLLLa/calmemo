@@ -1,0 +1,81 @@
+[package]
+name = "calmemo"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Local calendar CLI for holidays, vacations and working-day reports"
+license = "MIT"
+repository = "https://github.com/SkeLLLa/calmemo"
+readme = "README.md"
+keywords = ["calendar", "ical", "holidays", "vacation", "cli"]
+categories = ["command-line-utilities"]
+exclude = [
+  "/.claude/",
+  "/.github/",
+  "/.gitignore",
+  "/.mcp.json",
+  "/.mise.toml",
+  "/AGENTS.md",
+  "/Makefile",
+  "/clippy.toml",
+  "/release-plz.toml",
+  "/target/",
+]
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_lifetimes = "deny"
+unused_qualifications = "warn"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -2 }
+cargo = { level = "warn", priority = -3 }
+nursery = { level = "warn", priority = -4 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+multiple_crate_versions = "allow"
+must_use_candidate = "allow"
+redundant_pub_crate = "allow"
+similar_names = "allow"
+struct_excessive_bools = "allow"
+too_many_lines = "allow"
+
+[dependencies]
+anyhow = "1.0"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+clap = { version = "4.5", features = ["derive"] }
+icalendar = "0.16"
+uuid = { version = "1.23", features = ["v4"] }
+
+[package.metadata.deb]
+maintainer = "SkeLLLa"
+copyright = "2026, SkeLLLa"
+depends = "$auto"
+section = "utils"
+priority = "optional"
+extended-description = """\
+calmemo keeps a local iCalendar file with public holidays, vacations and
+sick leaves, renders it in the terminal and reports working / non-working
+days in a script-friendly format.
+"""
+assets = [
+  ["target/release/calmemo", "usr/bin/calmemo", "755"],
+  ["README.md", "usr/share/doc/calmemo/README.md", "644"],
+  ["LICENSE", "usr/share/doc/calmemo/LICENSE", "644"],
+]
+
+[package.metadata.generate-rpm]
+summary = "Local calendar CLI for holidays, vacations and working-day reports"
+license = "MIT"
+assets = [
+  { source = "target/release/calmemo", dest = "/usr/bin/calmemo", mode = "755" },
+  { source = "README.md", dest = "/usr/share/doc/calmemo/README.md", mode = "644", doc = true },
+  { source = "LICENSE", dest = "/usr/share/doc/calmemo/LICENSE", mode = "644", doc = true },
+]

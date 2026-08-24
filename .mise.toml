@@ -1,0 +1,45 @@
+[settings]
+lockfile = true
+http_retries = 3
+pin = true
+
+[settings.status]
+missing_tools = "always"
+
+[tools]
+rust = { version = "1.85.0", components = "rust-analyzer,rust-src" }
+cargo-binstall = "1.18.1"
+"cargo:cargo-deb" = "3.6.3"
+"cargo:cargo-generate-rpm" = "0.20.0"
+
+[tasks.build]
+description = "Build the Rust project"
+run = "cargo build"
+
+[tasks.fmt]
+description = "Format Rust sources"
+run = "cargo fmt --all"
+
+[tasks.fmt-check]
+description = "Check Rust formatting"
+run = "cargo fmt --all -- --check"
+
+[tasks.lint]
+description = "Run Clippy with warnings denied"
+run = "cargo clippy --all-targets --all-features -- -D warnings"
+
+[tasks.clippy]
+description = "Alias for lint"
+depends = ["lint"]
+
+[tasks.test]
+description = "Run the test suite"
+run = "cargo test"
+
+[tasks.doc]
+description = "Build crate docs with warnings denied"
+run = 'RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --document-private-items'
+
+[tasks.check]
+description = "Run the full quality suite"
+depends = ["fmt-check", "lint", "test", "doc"]

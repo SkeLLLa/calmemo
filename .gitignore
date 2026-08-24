@@ -1,0 +1,32 @@
+# Rust build output
+/target/
+
+# Rust coverage and profiling output
+/coverage/
+*.profraw
+*.profdata
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# Local environment files
+.env
+.env.*
+!.env.example
+.mise.local.toml
+
+# Editor and OS metadata
+.idea/
+.vscode/
+.DS_Store
+
+# Local assistant and analysis state
+.claude/settings.local.json
+.claude/.cc-writes/
+.codex/
+.mcp.json
+.serena/
