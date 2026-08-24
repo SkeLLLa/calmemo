@@ -168,11 +168,7 @@ fn main() -> Result<()> {
 }
 
 const fn plural(count: usize) -> &'static str {
-    if count == 1 {
-        ""
-    } else {
-        "s"
-    }
+    if count == 1 { "" } else { "s" }
 }
 
 /// Reads a bulk input file, or stdin when the path is `-`.

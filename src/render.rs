@@ -208,19 +208,11 @@ fn weekday_index(day: NaiveDate) -> usize {
 }
 
 const fn paint(code: &str, color: bool) -> &str {
-    if color {
-        code
-    } else {
-        ""
-    }
+    if color { code } else { "" }
 }
 
 const fn reset(color: bool) -> &'static str {
-    if color {
-        RESET
-    } else {
-        ""
-    }
+    if color { RESET } else { "" }
 }
 
 /// Legend of what the colors mean.

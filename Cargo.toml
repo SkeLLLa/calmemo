@@ -2,7 +2,7 @@
 name = "calmemo"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.88"
 description = "Local calendar CLI for holidays, vacations and working-day reports"
 license = "MIT"
 repository = "https://github.com/SkeLLLa/calmemo"
@@ -48,11 +48,14 @@ struct_excessive_bools = "allow"
 too_many_lines = "allow"
 
 [dependencies]
-anyhow = "1.0"
-chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
-clap = { version = "4.5", features = ["derive"] }
-icalendar = "0.16"
-uuid = { version = "1.23", features = ["v4"] }
+anyhow = "1.0.104"
+chrono = { version = "0.4.45", default-features = false, features = [
+  "clock",
+  "std",
+] }
+clap = { version = "4.6.6", features = ["derive"] }
+icalendar = "0.17.13"
+uuid = { version = "1.25.0", features = ["v4"] }
 
 [package.metadata.deb]
 maintainer = "SkeLLLa"
@@ -66,9 +69,21 @@ sick leaves, renders it in the terminal and reports working / non-working
 days in a script-friendly format.
 """
 assets = [
-  ["target/release/calmemo", "usr/bin/calmemo", "755"],
-  ["README.md", "usr/share/doc/calmemo/README.md", "644"],
-  ["LICENSE", "usr/share/doc/calmemo/LICENSE", "644"],
+  [
+    "target/release/calmemo",
+    "usr/bin/calmemo",
+    "755",
+  ],
+  [
+    "README.md",
+    "usr/share/doc/calmemo/README.md",
+    "644",
+  ],
+  [
+    "LICENSE",
+    "usr/share/doc/calmemo/LICENSE",
+    "644",
+  ],
 ]
 
 [package.metadata.generate-rpm]

@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use chrono::{Datelike, NaiveDate, Weekday};
 use clap::ValueEnum;
 use icalendar::{Calendar, Component, DatePerhapsTime, Event as IcalEvent, EventLike};
