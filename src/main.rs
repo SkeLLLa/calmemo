@@ -15,7 +15,7 @@ use chrono::Local;
 use clap::Parser;
 use cli::{Cli, Command};
 use std::io::{IsTerminal, Read};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use store::{Event, Store};
 
 fn main() -> Result<()> {
@@ -129,11 +129,17 @@ fn main() -> Result<()> {
             store.save()?;
         }
         Command::Remove { uids } => {
+            let removed = uids
+                .iter()
+                .map(|uid| store.find_mut(uid).map(|event| event.clone()))
+                .collect::<Result<Vec<_>>>()?;
             for uid in &uids {
-                let event = store.remove(uid)?;
-                println!("removed {}", render::event_line(&event, color));
+                store.remove(uid)?;
             }
             store.save()?;
+            for event in removed {
+                println!("removed {}", render::event_line(&event, color));
+            }
         }
         Command::Workdays { range } => {
             let (from, to) = range.resolve()?;
@@ -162,12 +168,16 @@ fn main() -> Result<()> {
 }
 
 const fn plural(count: usize) -> &'static str {
-    if count == 1 { "" } else { "s" }
+    if count == 1 {
+        ""
+    } else {
+        "s"
+    }
 }
 
 /// Reads a bulk input file, or stdin when the path is `-`.
 fn read_input(file: &Path) -> Result<String> {
-    if file == PathBuf::from("-") {
+    if file == Path::new("-") {
         let mut text = String::new();
         std::io::stdin()
             .read_to_string(&mut text)

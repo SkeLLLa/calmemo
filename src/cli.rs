@@ -1,5 +1,5 @@
 use crate::store::Kind;
-use anyhow::{Context, Result, bail};
+use anyhow::{bail, Context, Result};
 use chrono::{Datelike, Local, NaiveDate};
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;

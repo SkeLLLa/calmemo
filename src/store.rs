@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, bail};
+use anyhow::{bail, Context, Result};
 use chrono::{Datelike, NaiveDate, Weekday};
 use clap::ValueEnum;
 use icalendar::{Calendar, Component, DatePerhapsTime, Event as IcalEvent, EventLike};
@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
 /// Category stored in the `CATEGORIES` property of every event.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 pub enum Kind {
     /// Public holiday: non-working even on a weekday.
     Holiday,
@@ -158,13 +158,15 @@ impl Event {
             .flat_map(|property| property.value().split(','))
             .find_map(Kind::from_category)
             .unwrap_or(fallback);
+        let end = end.max(start);
+        let summary = event.get_summary().unwrap_or("(untitled)").to_owned();
         Some(Self {
             uid: event
                 .get_uid()
-                .map_or_else(|| uuid::Uuid::new_v4().to_string(), ToOwned::to_owned),
-            summary: event.get_summary().unwrap_or("(untitled)").to_owned(),
+                .map_or_else(|| format!("{start}-{end}-{summary}"), ToOwned::to_owned),
+            summary,
             start,
-            end: end.max(start),
+            end,
             kind,
         })
     }
@@ -250,7 +252,7 @@ impl Store {
             .unwrap_or(DEFAULT_CALENDAR)
     }
 
-    /// Writes the calendar atomically.
+    /// Writes the calendar through a temporary file and rename.
     pub fn save(&mut self) -> Result<()> {
         self.events
             .sort_by(|a, b| (a.start, a.end, &a.summary).cmp(&(b.start, b.end, &b.summary)));
@@ -399,7 +401,14 @@ pub fn parse_bulk(text: &str, fallback: Kind) -> Result<Vec<Event>> {
             fallback
         } else {
             kind.parse()
-                .map_err(|error| anyhow::anyhow!("line {}: {error}", number + 1))?
+                .map_err(|error| {
+                    let hint = if fields.len() == 3 {
+                        "; three-field lines are `start;kind;summary`; use `start;end;kind;summary` for date ranges"
+                    } else {
+                        ""
+                    };
+                    anyhow::anyhow!("line {}: {error}{hint}", number + 1)
+                })?
         };
         if end < start {
             bail!("line {}: end {end} is before start {start}", number + 1);
@@ -493,6 +502,30 @@ mod tests {
         calendar.push(original.to_ical());
         let parsed = parse_events(&calendar.to_string(), Kind::Note).unwrap();
         assert_eq!(parsed, vec![original]);
+    }
+
+    #[test]
+    fn missing_ical_uid_is_stable() {
+        let text = concat!(
+            "BEGIN:VCALENDAR\r\nVERSION:2.0\r\n",
+            "BEGIN:VEVENT\r\n",
+            "DTSTART;VALUE=DATE:20260201\r\n",
+            "DTEND;VALUE=DATE:20260206\r\n",
+            "SUMMARY:Ski\r\n",
+            "END:VEVENT\r\nEND:VCALENDAR\r\n",
+        );
+        let first = parse_events(text, Kind::Vacation).unwrap();
+        let second = parse_events(text, Kind::Vacation).unwrap();
+        assert_eq!(first, second);
+        assert_eq!(first[0].uid, "2026-02-01-2026-02-05-Ski");
+    }
+
+    #[test]
+    fn bulk_range_without_kind_explains_format() {
+        let error = parse_bulk("2026-02-01;2026-02-05;Ski\n", Kind::Vacation)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("three-field lines are `start;kind;summary`"));
     }
 
     #[test]

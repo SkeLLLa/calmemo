@@ -144,15 +144,15 @@ fn print_legend(store: &Store, from: NaiveDate, to: NaiveDate, color: bool) {
         return;
     }
     println!();
-    for event in events {
+    for &event in &events {
         println!("  {}", event_line(event, color));
     }
     let workdays = days(from, to).filter(|day| store.is_working(*day)).count();
     let total = days(from, to).count();
-    let events = store.in_range(from, to).len();
+    let event_count = events.len();
     println!(
-        "\n{events} event{}, {workdays} working days, {} days off",
-        if events == 1 { "" } else { "s" },
+        "\n{event_count} event{}, {workdays} working days, {} days off",
+        if event_count == 1 { "" } else { "s" },
         total - workdays
     );
 }
@@ -208,11 +208,19 @@ fn weekday_index(day: NaiveDate) -> usize {
 }
 
 const fn paint(code: &str, color: bool) -> &str {
-    if color { code } else { "" }
+    if color {
+        code
+    } else {
+        ""
+    }
 }
 
 const fn reset(color: bool) -> &'static str {
-    if color { RESET } else { "" }
+    if color {
+        RESET
+    } else {
+        ""
+    }
 }
 
 /// Legend of what the colors mean.
