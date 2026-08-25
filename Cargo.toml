@@ -15,6 +15,7 @@ exclude = [
   "/.gitignore",
   "/.mcp.json",
   "/.mise.toml",
+  "/.yamllint",
   "/AGENTS.md",
   "/Makefile",
   "/clippy.toml",
